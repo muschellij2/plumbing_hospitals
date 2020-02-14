@@ -1,23 +1,16 @@
 ---
-title: Using Plumber to Create a Distributed Modeling Framework for Protected Data
+title: Practical Applications for a Distributed Modeling Framework for Protected Data
 author:
-  - name: Alice Anonymous
-    email: alice@example.com
-    affiliation: Some Institute of Technology
+  - name: John Muschelli III
+    email: jmusche1@jhu.edu
+    affiliation: Johns Hopkins Bloomberg School of Public Health
     footnote: Corresponding Author
-  - name: Bob Security
-    email: bob@example.com
-    affiliation: Another University
 address:
-  - code: Some Institute of Technology
-    address: Department, Street, City, State, Zip
-  - code: Another University
-    address: Department, Street, City, State, Zip
+  - code: Johns Hopkins Bloomberg School of Public Health
+    address: Department of Biostatistics, 615 N Wolfe St, Baltimore MD, 21205
 abstract: |
-  This is the abstract.
-
-  It consists of two paragraphs.
-
+  We present 2 practical approaches to fitting generalized linear models in a distributed framework.  The use case for this framework is where multiple sites (e.g. hospitals) have data with protected or private information that cannot be shared, but aggregated data can be, and each site can send aggregated data across the internet.  
+  We present the first strategy: using synced folder services, such as Dropbox or Box Sync, to share the aggregated data.  The second strategy involves creating an application programming interface (API), where sites submit the data to this service.  This work relies on the R statistical software; we provide an R package of examples and code to create an API on DigitalOcean.
 journal: "An awesome journal"
 date: "`r Sys.Date()`"
 bibliography: refs.bib
@@ -35,11 +28,14 @@ library(dplyr)
 
 
 # Introduction
-Here we introduce a conceptual framework to analyze data from multiple sources with the data being properly siloed.  
+We introduce a distrbuted framework to analyze data from multiple sources with the data being properly siloed. The motivation for this problem is simple: we would like to fit a generalized linear model on data from multiple sites (e.g. hospitals), where the indvidual patient-level data or otherwise private data never leaves the server (siloed), which is usually behind a firewall.  The idea is that a model is specified, and sent to each site where a summary statistic is computed and returned to the modeling service/site.  The model is then updated and, if necessary, the process is completed until the model is fit until convergence.  The goal is to fit the exact model as if the full data was accessible.  
 
-The motivation for this problem is simple: we would like to fit a statistical model on data from multiple hospitals, where the indvidual patient-level data never leaves the server.  The idea is that a model is specified, and sent to each hospital where a summary statistic is computed and returned to the modeler.  The model is then updated and, if necessary, the process is completed until the model is fully fit.  
+The alternatives to this process is meta-analysis or one-step solutions.  There are drawbacks to a meta-analysis approach in that the model and statistics must be specified and commonly the data is gathered once from each site.  Also, if sites present estimates from models with different predictors, it is unclear how meta-analysis adequately handles this variability.  The process below ensures that the same model, with the same predictors, is fit at each site.  Any updated analysis requires additional correspondence between the modeler and the site data analyst, which slows down the process of analysis and creates more hurdles.  
 
-The alternative to this process is meta-analysis.  There are drawbacks to a meta-analysis approach in that the model and statistics must be specified and commonly the data is gathered once from each hospital.  Any updated analysis requires additional correspondence between the modeler and the hospital data person, which slows down the process of analysis and creates more hurdles.  If this process is automated through a system such as the API described below, this alleviates the need for staff to run the computations individually (which can cause errors).  Moreover, when a hospital no longer wants to participate in the modeling process, they can simply shut off their server.  
+
+Though this type of framework has been discussed many times, we implemented a practical solution in an R package that allows researchers to practically implement this system with real data.  The solution can be done a number of ways; we implemented 1) code to deploy an API (application programming interface) on a remote server and 2) scripts to calculate the model if using a synced folder, backed by services such as Dropbox or Box Sync.  
+
+If this process is automated through a system such as the application programming interface or a synced folder described below, this alleviates the need for staff to run the computations individually (which can cause errors).  Moreover, when a hospital no longer wants to participate in the modeling process, they can simply shut off their server.  
 
 
 Chen et al. describes these processes as one-shot or multi-shot analyses.  
