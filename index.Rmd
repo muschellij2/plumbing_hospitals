@@ -40,6 +40,11 @@ These methods provide great approximate solutions because 1) they are not iterat
  
 The work presented here is similar to that of @o2009regression as it has a remote analysis server, but with a main difference.  Practical implementations such as WebDISCO (web service for distributed Cox model learning) exist, but these rely on a third-party service (at this time the WebDISCO URL is a dead link) or a remote analysis server.  In @o2009regression and most remote analysis servers, a full dataset primarily exists.  That is, the full data is available to that server, but not those submitting the models.  Moreover, these remote analysis servers may be complicated and costly to set up.  We will present a system that does have the same constraints, as it will rely on a few scripts or spooling up on a server on a low-cost online service with one command.  
 
+
+<!-- For almost any approach, the gradient or some reduced-dimensional summary is required to be aggregated together to get the estimate of $\beta$ at the full population level.  If we combine these models with models that require iterative fitting, such as Generalized Linear Models (GLMs), there needs to be a lot of communication and recomputation of summaries to get a final estimate.  These approaches work well in distributed computing systems (such as computing clusters or GPUs), but have a much higher likelihood for errors if human interaction is required at each iteration.  This human interaction is a common practice for most clinical data, which we wish to show a simple solution to create the distributed computing much simpler. -->
+
+
+
 That said, the previous methods and authors present solutions with a series of additional checks with privacy-preserving measures which we offload a bit on to the analyst at each separate site.  We argue that analysts already have this responsibility, but in a more informal way. In some of the applications above, such as some of the one-shot solutions, the model specification and updates are communicated by easy, likely unsecure methods such as email.  Thus, it would seem as though iterative methods can give exact solutions in a secure way, but the iterative process is burdensome.  We wish to make the iterative process easy and user-friendly.
 
 
@@ -56,24 +61,22 @@ $$
 g(E[Y | X]) = X\beta = \eta
 $$
 
-$$
-u_i = \sum W (y_i - \mu) \frac{d\eta}{d\mu}x_i
-$$
-where 
-$$
-W^{-1} = \left(\frac{d\eta}{d\mu}\right)^2V
-$$
-and $V$ is the variance function for the GLM evaluated at $\mu$.  
-
 Let us also say that we are interested in $p$ covariates, and $n_{k}$ is the total number of records at hospital $k$ and $n = \sum_{1}^{k} n_{k}$, is the number of rows of $Y$ and $X$, thus $Y$ is an $n\text{x}1$ vector and $X$ is a $n\text{x}p$ matrix.  To estimate $\beta$, we would use:
 $$
 (X'WX)^{-1} X'WY
 $$
-where $A = X'WX$ is a $p\text{x}p$ matrix and $X'Y$ is a $p\times{1}$ vector.  But in our case, we can use $u$, which is a $p\times 1$ vector
 
-Since we don't have access to $X$, but rather a series of $X_{k}$, $k = 1, \dots, K$, we can use methods such as parallelized gradient descent approaches [@zinkevich2010parallelized; @mcdonald2009efficient] or approximate maximum-likelihood approaches [@duncan1980approximate].  We choose to use the Fisher scoring method outlined in @mcculloch2000generalized (page 42).  For generalized linear models,  we simply need $A}$ and $u$
+Since we don't have access to the full $X$, but rather a series of $X_{k}$, $k = 1, \dots, K$, we can use methods such as parallelized gradient descent approaches [@zinkevich2010parallelized; @mcdonald2009efficient] or approximate maximum-likelihood approaches [@duncan1980approximate].  We choose to use the Fisher scoring method outlined in @mcculloch2000generalized (page 42), such that:
 
-Regardless, for almost any approach, the gradient or some reduced-dimensional summary is required to be aggregated together to get the estimate of $\beta$ at the full population level.  Now, if we combine these models with models that require iterative fitting, such as Generalized Linear Models (GLMs), there needs to be a lot of communication and recomputation of summaries to get a final estimate.  These approaches work well in distributed computing systems (such as computing clusters or GPUs), but have a much higher likelihood for errors if human interaction is required at each iteration.  This human interaction is a common practice for most clinical data, which we wish to show a simple solution to create the distributed computing much simpler.
+$$
+u_{i,k} = \sum W (y_{i,k} - \mu) \frac{d\eta}{d\mu}x_{i,k}
+$$
+where we will get $u_{k} = \sum_{i} u_{i, k}$ and 
+$$
+W^{-1} = \left(\frac{d\eta}{d\mu}\right)^2V
+$$
+where $V$ is the variance function for the GLM evaluated at $\mu$.  If we let $A_{k} = X_k'W_kX_k$ we can get $A = \sum_{k}A_{k}$, which is a $p\text{x}p$ matrix.  If we get $u_{k}$, which is a $p\times 1$ vector, then we can calculate $u = \sum_{k} u_{k}$ to get the necessary gradient $\nabla\beta$ by $A^{-1} u$.  Thus, for generalized linear models, we simply need only to pass a $p\timesp$ matrix $A$ and $p\times{1}$ vector $u$ fom each site. 
+
 
 
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.5.8)  14 FEB 2020 17:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (TeX Live 2019) (preloaded format=pdflatex 2019.5.8)  16 FEB 2020 13:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -648,9 +648,9 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 
 
 {/usr/local/texlive/2019/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] [2]
-! Extra }, or forgotten $.
-l.230 ...alized linear models, we simply need \(A}
-                                                  \) and \(u\) 
+! Undefined control sequence.
+l.234 to pass a \(p\timesp
+                          \) matrix \(A\) and \(p\times{1}\) vector \(u\) fom 
 Here is how much of TeX's memory you used:
  12213 strings out of 492616
  176321 string characters out of 6129482
