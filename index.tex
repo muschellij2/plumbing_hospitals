@@ -168,35 +168,62 @@ learning) exist, but these rely on a third-party service (at this time
 the WebDISCO URL is a dead link) or a remote analysis server. In O'Keefe
 and Good (2009) and most remote analysis servers, a full dataset
 primarily exists. That is, the full data is available to that server,
-but not those submitting the models. Moreover, these remote analysis
-servers may be complicated and costly to set up. We will present a
-system that does have the same constraints, as it will rely on a few
-scripts or spooling up on a server on a low-cost online service with one
-command.
+but not those submitting the models.
 
-That said, the previous methods and authors present solutions with a
-series of additional checks with privacy-preserving measures which we
-offload a bit on to the analyst at each separate site. We argue that
-analysts already have this responsibility, but in a more informal way.
-In some of the applications above, such as some of the one-shot
-solutions, the model specification and updates are communicated by easy,
-likely unsecure methods such as email. Thus, it would seem as though
-iterative methods can give exact solutions in a secure way, but the
-iterative process is burdensome. We wish to make the iterative process
-easy and user-friendly.
+The most common federated learning architecture is Federated Averaging
+(McMahan et al., 2016), which uses stochastic gradient descent to
+combine neural network parameters from multiple devices into one
+platform. Many platforms have been developed for this type of federated
+learing, such as Federated Learning platform from Google for deep
+learning (Bonawitz et al., 2019), Content Object Repository Discovery
+and Registration/Resolution Architecture (CORDA), which website does not
+seem to be associated with the platform anymore). Geyer et al. (2017)
+and https://comind.org/ provide code on how to set up clients and run a
+federated deep learning model, but we wish to focus on simpler GLMs in
+this work, but acknowledge similar inference could be reframed in work
+based on Tensorflow. Li et al. (2019) provides an overview of federated
+learning
 
-We implemented a practical solution in an R package that allows
-researchers to practically implement this system with real data. The
-solution can be done a number of ways; we implemented 1) code to deploy
-an API (application programming interface) on a remote server and 2)
-scripts to calculate the model if using a synced folder, backed by
-services such as Dropbox or Box Sync. This practical solution solves the
-motivating problem, allowing us to fit many different types of models
-with little technical overhead while keeping protected health
-information (PHI) private.
+Moreover, some remote analysis servers may be complicated and costly to
+set up or have little to no instruction on how to set them up, save for
+the examples with code above. We will present a system that does have
+the same constraints, as it will rely on a few scripts or spooling up on
+a server on a low-cost online service with one command.
+
+We are not experts in distributed/federated computing, but would like to
+show how this process is possible, overlooking obvious hurdles such as
+authentication, load balancing, network issues, debugging, and overall
+security on the server side. That said, some of the previous methods and
+authors present solutions with a series of additional checks with
+privacy-preserving measures which can be implemented. We argue that
+analysts already have this responsibility of security, but in a more
+informal way. In some of the applications above, such as some of the
+one-shot solutions, the model specification and updates are communicated
+by easy, likely unsecure methods such as email. Thus, it would seem as
+though iterative methods can give exact solutions in a secure way, but
+the iterative process is burdensome, and one-shot solutions are
+user-friendly but potentially as insecure as the proposed method. We
+wish to make the iterative process easy and user-friendly.
+
+A large reason for the importance of usuability is that the
+statisticians and data analysts that will be running the models will
+likely be using a statistical language, usually either R or Python.
+Though we will focus on R, the ideas here can be extended to other
+languages and systems (R Core Team, 2020). We implemented a practical
+solution in an R package that allows researchers to practically
+implement this system with real data. The solution can be done a number
+of ways; we implemented 1) code to deploy an API (application
+programming interface) on a remote server and 2) scripts to calculate
+the model if using a synced folder, backed by services such as Dropbox
+or Box Sync. This practical solution solves the motivating problem,
+allowing us to fit many different types of models with little technical
+overhead while keeping protected health information (PHI) private.
+
+\hypertarget{methods}{%
+\section{Methods}\label{methods}}
 
 \hypertarget{motivating-example}{%
-\section{Motivating Example}\label{motivating-example}}
+\subsection{Motivating Example}\label{motivating-example}}
 
 Let's estimate a GLM an outcome \(Y\) on a set of covariates \(X\), with
 a link function \(G\). Let there be \(K\) hospitals, and \(Y\) and \(X\)
@@ -230,12 +257,61 @@ W^{-1} = \left(\frac{d\eta}{d\mu}\right)^2V
 \(A = \sum_{k}A_{k}\), which is a \(p\text{x}p\) matrix. If we get
 \(u_{k}\), which is a \(p\times 1\) vector, then we can calculate
 \(u = \sum_{k} u_{k}\) to get the necessary gradient \(\nabla\beta\) by
-\(A^{-1} u\). Thus, for generalized linear models, we simply need only
-to pass a \(p\timesp\) matrix \(A\) and \(p\times{1}\) vector \(u\) fom
-each site.
+\(A^{-1} u\). To estimate the dispersion parameter \(\phi\), we need the
+sample size for each site \(n_{k}\) and the sum of squared residuals,
+which each are a scalar number. Thus, for generalized linear models, we
+need only to pass a \(p\times{p}\) matrix \(A\) and \(p\times{1}\)
+vector \(u\), and 2 scalar values from each site.
 
-\hypertarget{methods}{%
-\section{Methods}\label{methods}}
+\hypertarget{implementation}{%
+\subsection{Implementation}\label{implementation}}
+
+We provide the \texttt{distribglm}
+(https://github.com/muschellij2/distribglm) R package to perform the
+distributed learning models. The functions provided wherein allow for
+the fitting of models in addition to 2 specific sets of examples: a
+\texttt{plumber} file and a set of examples files using a ``synced
+folder''.
+
+\hypertarget{synced-folder-implementation}{%
+\subsubsection{Synced Folder
+Implementation}\label{synced-folder-implementation}}
+
+Example synced folders are Dropbox or Box Sync. Outside of the R
+package, all sites would have access to a synced folder. This folder
+will only contain information about the model specifications and the
+estimates above. \textbf{No PHI would go in this folder}, as it is
+shared across sites and the main compute site, which may be a
+data-sharing site.
+
+The first step in the process is to set up the model (with the
+\texttt{setup\_model} function), which requires the synced folder
+location, the generalized linear model formula, which exponential family
+(and link function) is to be fit, a model name, the identifiers for all
+the sites to use for this model, and an optional tolerance measure that
+defines when a model has converged. The site identifiers are necessary
+for bookkeeping as well as to notify the compute site when all sites
+have returned the updated statistics for aggregation and provides a
+notification to each site as to whether the process is waiting on other
+sites or the compute site.
+
+Once this function is run, the output file is synced across all sites
+and the compute site. The data sites then run \texttt{estimate\_model}
+at the same time and the compute site runs \texttt{compute\_model}.
+Again, as these updates are required to be synchronous, these have to be
+run at the same time. We believe a simple conference call walking
+through each step is a practical example of when this would occur. Each
+site must change the code to read in the data (from a different location
+than the synced folder) into R, provide the site name, and the location
+of the synced folder on their machine, as this may vary across
+sites/computers. The data set will have its rows shuffled and the
+parameters estimated and only the parameter information will be sent.
+
+Once finished, the model will be returned and saved. At that point, all
+iterations could be deleted or archived.
+
+\hypertarget{plumber-implementation}{%
+\subsubsection{Plumber Implementation}\label{plumber-implementation}}
 
 \texttt{plumber} is an R package that creates APIs (Application
 programming interfaces) for and from R (Trestle Technology, LLC, 2018).
@@ -243,30 +319,32 @@ Though there are many frameworks to create APIs, such as Node.js and
 Flask, we will focus on \texttt{plumber} for a number of reasons.
 Overall, the API needs a computational backbone for this process to
 work. As \texttt{plumber} is based in R, we know that the server will
-have this already installed. Another reason is that the statisticians
-and data analysts that will be running the models will likely be using a
-statistical language, usually either R or Python. Though we will focus
-on R, the ideas here can be extended to other languages and systems. We
-are not experts in distributed computing, but would like to show how
-this process is possible, overlooking obvious hurdles such as
-authentication, load balancing, network issues, debugging, and overall
-security on the server side.
+have this already installed. The function
+\texttt{do\_provision\_glm\_api} will provision a DigitalOcean
+(https://www.digitalocean.com/) ``droplet'', which is an instance of a
+running virtual machine on a server. This will install R on the server,
+web services such as \texttt{nginx}, \texttt{plumber}, and all the
+necessary R packages to perform the distributed computing.
 
-The framework is as follows: a developer makes an R package with a
-\texttt{plumber} API specification inside of it of the inputs and
-outputs necessary for a specific model. For example, fitting a linear
-model where the analyst specifies predictors and an outcome. The API has
-endpoints that take in this model, run a specified computation on the
-server (behind the hospital firewall), and returns a result that has
-only aggregate data (such as a \(p\text{x}p\) matrix). The API logs the
-output for potential future debugging and audits of the process. The
-analysis system receives the output for each hospital, creates and
-updated estimate of the model and runs the next iteration from each
-hospital again until convergence. Thus, this system.
+The process is similar as above, but the need for a ``compute site'' is
+now replaced by the API. The additional parameter required is the URL to
+the API endpoint, which will be given to each site. A modeler or someone
+to specify the model is still required, which would use
+\texttt{api\_setup\_model} with the same information as above. The model
+then would make the same folder structure as in the synced folder
+implementation above. The sites would then run
+\texttt{api\_estimate\_model}, which would pass in the data the same
+way, and send the same information as above, but again requiring the URL
+of the API to be passed in for both functions. Additional login
+information and API keys can be set up so that more formal
+authentication can be performed
 
 \begin{figure}
 \includegraphics[width=1\linewidth]{sketch} \caption{Proposed Framework.  The modeler/analyst specifies a model, sends the model specification to an endpoint on each hospital API, a computation is run and returned to the analyst and aggregated (usually a gradient).  The model estimates are updated and the process repeats until the model converges.  }\label{fig:unnamed-chunk-1}
 \end{figure}
+
+\hypertarget{results}{%
+\subsection{Results?}\label{results}}
 
 \hypertarget{issues}{%
 \section{Issues}\label{issues}}
@@ -279,24 +357,33 @@ may be more secure than the alternative of sending estimates in other
 communication systems such as email. Though emailing has the upside of a
 human ensuring only aggregate data is transferred, it drastically
 increases the potential for wrong computation. For example, the
-\texttt{plumber} API can have checks on the data for missingness,
-quality, the sample size is equal to that of the previous
+\texttt{distriblm} package can have add checks on the data for
+missingness, quality, the sample size is equal to that of the previous
 iteration/model, and other issues, which may be done at varying levels
 at each institution.
 
-If the institution allows the API to be supported, then a server is
-required, and usually an administrator to oversee it. This administrator
-is usually trained in information systems or information technology,
-which is likely not part of the clinical team. Thus, providing support
-or interaction from the clinical team to the technical personnel can be
-more costly than simply emailing estiamtes. Lastly, many institutions
-and research groups would like a ``handle'' on what models are being fit
-with their data, and thus limits on the API need to be created, which
-may cause other issues or limitations on teh proposed framework.
+If a user chooses the API solution, then a server is required, and
+though we provide an easy solution on DigitalOcean, many institutions
+choose to use their own systems, which may require an administrator to
+oversee it. This administrator is usually trained in information systems
+or information technology, which is likely not part of the clinical
+team. Thus, providing support or interaction from the clinical team to
+the technical personnel can be more costly than simply emailing
+estimates. Lastly, many institutions and research groups would like a
+``handle'' on what models are being fit with their data, and thus limits
+on the API need to be created, which may cause other issues or
+limitations on teh proposed framework.
 
-These downsides are vastly outweighed when the API gets repeated use.
-Thsu, fitting one model one time does not generally warrant the work
-needed to set up this framework.
+These downsides are vastly outweighed when the system gets repeated use.
+Thus, fitting one model one time does not generally warrant the work
+needed to set up this framework. One specific example is running the
+same model with different combinations of sites, allowing for a formal
+sensitivity analysis.
+
+Additional security requirements should like be enabled on such as
+platform, such as random sub-sampling of the data at each site, adding
+noise to the vectors and matrices passed so that the sum is the same but
+each individual site has distorted estimates,
 
 \hypertarget{references}{%
 \section*{References}\label{references}}
@@ -308,6 +395,12 @@ needed to set up this framework.
 Battey, H., Fan, J., Liu, H., Lu, J., Zhu, Z., 2018. Distributed testing
 and estimation under sparse high dimensional models. Annals of
 statistics 46, 1352.
+
+\leavevmode\hypertarget{ref-bonawitz2019towards}{}%
+Bonawitz, K., Eichner, H., Grieskamp, W., Huba, D., Ingerman, A.,
+Ivanov, V., Kiddon, C., Konecny, J., Mazzocchi, S., McMahan, H.B.,
+others, 2019. Towards federated learning at scale: System design. arXiv
+preprint arXiv:1902.01046.
 
 \leavevmode\hypertarget{ref-duan2019odal}{}%
 Duan, R., Boland, M.R., Moore, J.H., Chen, Y., 2019. ODAL: A one-shot
@@ -325,10 +418,19 @@ Kantarcioglu, M., 2013. A secure distributed logistic regression
 protocol for the detection of rare adverse drug events. Journal of the
 American Medical Informatics Association 20, 453--461.
 
+\leavevmode\hypertarget{ref-2017arXiv171207557G}{}%
+Geyer, R.C., Klein, T., Nabi, M., 2017. Differentially Private Federated
+Learning: A Client Level Perspective. ArXiv e-prints.
+
 \leavevmode\hypertarget{ref-jordan2019communication}{}%
 Jordan, M.I., Lee, J.D., Yang, Y., 2019. Communication-efficient
 distributed statistical inference. Journal of the American Statistical
 Association 114, 668--681.
+
+\leavevmode\hypertarget{ref-li2019federated}{}%
+Li, T., Sahu, A.K., Talwalkar, A., Smith, V., 2019. Federated learning:
+Challenges, methods, and future directions. arXiv preprint
+arXiv:1908.07873.
 
 \leavevmode\hypertarget{ref-mcculloch2000generalized}{}%
 McCulloch, C.E., 2000. Generalized linear models. Journal of the
@@ -340,6 +442,11 @@ Efficient large-scale distributed training of conditional maximum
 entropy models, in: Advances in Neural Information Processing Systems.
 pp. 1231--1239.
 
+\leavevmode\hypertarget{ref-mcmahan2016communication}{}%
+McMahan, H.B., Moore, E., Ramage, D., Hampson, S., others, 2016.
+Communication-efficient learning of deep networks from decentralized
+data. arXiv preprint arXiv:1602.05629.
+
 \leavevmode\hypertarget{ref-o2008remote}{}%
 O'Keefe, C.M., Good, N.M., 2008. A remote analysis server-what does
 regression output look like?, in: International Conference on Privacy in
@@ -348,6 +455,10 @@ Statistical Databases. Springer, pp. 270--283.
 \leavevmode\hypertarget{ref-o2009regression}{}%
 O'Keefe, C.M., Good, N.M., 2009. Regression output from a remote
 analysis server. Data \& Knowledge Engineering 68, 1175--1186.
+
+\leavevmode\hypertarget{ref-RCORE}{}%
+R Core Team, 2020. R: A language and environment for statistical
+computing. R Foundation for Statistical Computing, Vienna, Austria.
 
 \leavevmode\hypertarget{ref-tong2020robust}{}%
 Tong, J., Duan, R., Li, R., Scheuemie, M.J., Moore, J.H., Chen, Y.,
