@@ -22,8 +22,14 @@ output:
     keep_tex: true
     number_sections: yes
     keep_md: true
+keywords:
+  # at least one keyword must be supplied
+  formatted: [federated learning, generalized linear models, glm, "\\proglang{R}"]
+  plain:     [federated learning, generalized linear models, glm, R]
 ---
-
+  <!-- bookdown::pdf_book: -->
+  <!--   base_format: rticles::jss_article     -->
+  
 
 
 
@@ -275,13 +281,13 @@ head(df)
 ```
 
 ```
-         x1          x2    prob_y y      lambda pois_y site
-1  1.788201 -0.09157237 0.9250290 1  12.3384879     14    3
-2  3.132795  0.36388224 0.9829905 1  57.7907887     57    3
-3  3.598179 -2.93762750 0.9964207 1 278.3868129    280    4
-4 -1.342732 -0.67252557 0.2267669 0   0.2932711      1    1
-5  3.410662 -0.23020935 0.9898732 1  97.7477719     84    4
-6  1.200794 -0.47624912 0.8691959 1   6.6450192      6    2
+        x1         x2    prob_y y     lambda pois_y site
+1 1.277891 -0.1166720 0.8678826 0   6.569025      7    2
+2 2.197521  0.4546673 0.9458590 1  17.470278     14    1
+3 1.822167  2.5675173 0.8528905 1   5.797658      0    1
+4 1.768887  2.2130484 0.8578070 1   6.032696      6    3
+5 1.132712  1.5560256 0.7683614 1   3.317070      4    1
+6 5.206581 -0.1017979 0.9988749 1 887.816500    894    4
 ```
 
 The `df` object is the full data, and we can estimate the "true" model from the full data set.  Again, this model is the output we are trying to estimate exactly, not approximate:
@@ -355,7 +361,7 @@ for (i in 1:10) {
 }
 ```
 
-In this example, the model converged in $9$ iterations.  In practice, each site would simply run `api_estimate_model`, which wraps both the `api_submit_gradient` and `api_get_current_beta` functionality, but we separate them here as we are running multiple sites worth of data.  The output `eta` contains estimates, of the model, but we should use `api_model_converged` to extract the converged model.  Using `api_model_converged` allows us to get an object similar to the `glm` object in `R`, which the `true_model` for easier comparison.  
+In this example, the model converged in $8$ iterations.  In practice, each site would simply run `api_estimate_model`, which wraps both the `api_submit_gradient` and `api_get_current_beta` functionality, but we separate them here as we are running multiple sites worth of data.  The output `eta` contains estimates, of the model, but we should use `api_model_converged` to extract the converged model.  Using `api_model_converged` allows us to get an object similar to the `glm` object in `R`, which the `true_model` for easier comparison.  
 
 
 ```r
@@ -369,11 +375,11 @@ Call:  glm(formula = y ~ x1 + x2, family = `binomial(link="logit")`)
 
 Coefficients:
 (Intercept)           x1           x2  
-     0.3782       1.2917      -0.2982  
+     0.3048       1.1322      -0.3337  
 
 Degrees of Freedom: 999 Total (i.e. Null);  997 Residual
 Null Deviance:	    NA 
-Residual Deviance: 341.9 	AIC: 347.9
+Residual Deviance: 588.5 	AIC: 594.5
 ```
 
 Let's compare that to the full-dataset model:
@@ -388,11 +394,11 @@ Call:  glm(formula = y ~ x1 + x2, family = binomial(), data = df)
 
 Coefficients:
 (Intercept)           x1           x2  
-     0.3782       1.2917      -0.2982  
+     0.3048       1.1322      -0.3337  
 
 Degrees of Freedom: 999 Total (i.e. Null);  997 Residual
-Null Deviance:	    537.8 
-Residual Deviance: 341.9 	AIC: 347.9
+Null Deviance:	    927.5 
+Residual Deviance: 588.5 	AIC: 594.5
 ```
 We see the same results for the $\beta$ estimates.  We have not implemented an estimate of the null deviance at this time, but will so in the next iteration of `distribglm`.   We can compare covariance matrices for the estimated, and show that it is the same, up to some precision tolerance:
 
@@ -402,7 +408,7 @@ max(abs(vcov(true_model) - model$covariance))
 ```
 
 ```
-[1] 2.228917e-07
+[1] 4.429585e-07
 ```
 
 Note, the tolerance may need to be higher for models small effects or variance, or the model covariates should be scaled so that results are not affected by floating point issues.  We can look at the z-scores and p-values from the model as well:
@@ -414,10 +420,10 @@ true_summary$coefficients
 ```
 
 ```
-              Estimate Std. Error   z value     Pr(>|z|)
-(Intercept)  0.3782440  0.1989770  1.900943 5.730945e-02
-x1           1.2916663  0.1309049  9.867214 5.774599e-23
-x2          -0.2981873  0.0752740 -3.961359 7.452439e-05
+             Estimate Std. Error   z value     Pr(>|z|)
+(Intercept)  0.304758 0.12097208  2.519243 1.176076e-02
+x1           1.132189 0.08893232 12.730905 3.981979e-37
+x2          -0.333722 0.05659783 -5.896374 3.715764e-09
 ```
 
 ```r
@@ -426,7 +432,7 @@ model$z_value
 
 ```
 (Intercept)          x1          x2 
-   1.900940    9.867150   -3.961347 
+   2.519223   12.730548   -5.896283 
 ```
 
 which agree up to the 6th decimal point.  

@@ -22,8 +22,14 @@ output:
     keep_tex: true
     number_sections: yes
     keep_md: true
+keywords:
+  # at least one keyword must be supplied
+  formatted: [federated learning, generalized linear models, glm, "\\proglang{R}"]
+  plain:     [federated learning, generalized linear models, glm, R]
 ---
-
+  <!-- bookdown::pdf_book: -->
+  <!--   base_format: rticles::jss_article     -->
+  
 ```{r setup, include = FALSE}
 library(knitr)
 library(analogsea)
@@ -32,6 +38,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, comment = "")
 library(dplyr)
 library(broom)
 library(ggplot2)
+set.seed(20201009)
 ```
 
 
