@@ -375,13 +375,13 @@ We will present examples of fitting GLMs from data and compare the results to th
 \end{Shaded}
 
 \begin{verbatim}
-        x1         x2    prob_y y   lambda pois_y site
-1 2.277266 -0.6912108 0.9645639 1 27.21985     29    3
-2 1.730164 -2.1913106 0.9556423 1 21.54401     18    4
-3 3.068645  1.6047069 0.9735165 1 36.75940     34    1
-4 3.337471  1.7383526 0.9801662 1 49.41893     53    4
-5 2.254351 -0.6310517 0.9629329 0 25.97810     23    4
-6 3.035202 -1.1889643 0.9878798 1 81.50722     74    3
+         x1          x2    prob_y y      lambda pois_y site
+1  1.788201 -0.09157237 0.9250290 1  12.3384879     14    3
+2  3.132795  0.36388224 0.9829905 1  57.7907887     57    3
+3  3.598179 -2.93762750 0.9964207 1 278.3868129    280    4
+4 -1.342732 -0.67252557 0.2267669 0   0.2932711      1    1
+5  3.410662 -0.23020935 0.9898732 1  97.7477719     84    4
+6  1.200794 -0.47624912 0.8691959 1   6.6450192      6    2
 \end{verbatim}
 
 The \texttt{df} object is the full data, and we can estimate the ``true'' model from the full data set. Again, this model is the output we are trying to estimate exactly, not approximate:
@@ -472,11 +472,11 @@ Call:  glm(formula = y ~ x1 + x2, family = `binomial(link="logit")`)
 
 Coefficients:
 (Intercept)           x1           x2  
-     0.1757       1.1612      -0.2306  
+     0.3782       1.2917      -0.2982  
 
 Degrees of Freedom: 999 Total (i.e. Null);  997 Residual
 Null Deviance:      NA 
-Residual Deviance: 434.8    AIC: 440.8
+Residual Deviance: 341.9    AIC: 347.9
 \end{verbatim}
 
 Let's compare that to the full-dataset model:
@@ -492,11 +492,11 @@ Call:  glm(formula = y ~ x1 + x2, family = binomial(), data = df)
 
 Coefficients:
 (Intercept)           x1           x2  
-     0.1757       1.1612      -0.2306  
+     0.3782       1.2917      -0.2982  
 
 Degrees of Freedom: 999 Total (i.e. Null);  997 Residual
-Null Deviance:      671.9 
-Residual Deviance: 434.8    AIC: 440.8
+Null Deviance:      537.8 
+Residual Deviance: 341.9    AIC: 347.9
 \end{verbatim}
 
 We see the same results for the \(\beta\) estimates. We have not implemented an estimate of the null deviance at this time, but will so in the next iteration of \texttt{distribglm}. We can compare covariance matrices for the estimated, and show that it is the same, up to some precision tolerance:
@@ -508,7 +508,7 @@ We see the same results for the \(\beta\) estimates. We have not implemented an 
 \end{Shaded}
 
 \begin{verbatim}
-[1] 2.288312e-09
+[1] 2.228917e-07
 \end{verbatim}
 
 Note, the tolerance may need to be higher for models small effects or variance, or the model covariates should be scaled so that results are not affected by floating point issues. We can look at the z-scores and p-values from the model as well:
@@ -522,9 +522,9 @@ Note, the tolerance may need to be higher for models small effects or variance, 
 
 \begin{verbatim}
               Estimate Std. Error   z value     Pr(>|z|)
-(Intercept)  0.1757286 0.16762941  1.048316 2.944931e-01
-x1           1.1612277 0.10374538 11.193054 4.409779e-29
-x2          -0.2306396 0.06351617 -3.631194 2.821126e-04
+(Intercept)  0.3782440  0.1989770  1.900943 5.730945e-02
+x1           1.2916663  0.1309049  9.867214 5.774599e-23
+x2          -0.2981873  0.0752740 -3.961359 7.452439e-05
 \end{verbatim}
 
 \begin{Shaded}
@@ -535,7 +535,7 @@ x2          -0.2306396 0.06351617 -3.631194 2.821126e-04
 
 \begin{verbatim}
 (Intercept)          x1          x2 
-   1.048316   11.193053   -3.631194 
+   1.900940    9.867150   -3.961347 
 \end{verbatim}
 
 which agree up to the 6th decimal point.
