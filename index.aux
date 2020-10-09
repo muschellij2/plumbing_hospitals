@@ -1,0 +1,49 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\bibstyle{elsarticle-harv}
+\providecommand\HyperFirstAtBeginDocument{\AtBeginDocument}
+\HyperFirstAtBeginDocument{\ifx\hyper@anchor\@undefined
+\global\let\oldcontentsline\contentsline
+\gdef\contentsline#1#2#3#4{\oldcontentsline{#1}{#2}{#3}}
+\global\let\oldnewlabel\newlabel
+\gdef\newlabel#1#2{\newlabelxx{#1}#2}
+\gdef\newlabelxx#1#2#3#4#5#6{\oldnewlabel{#1}{{#2}{#3}}}
+\AtEndDocument{\ifx\hyper@anchor\@undefined
+\let\contentsline\oldcontentsline
+\let\newlabel\oldnewlabel
+\fi}
+\fi}
+\global\let\hyper@last\relax 
+\gdef\HyperFirstAtBeginDocument#1{#1}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\emailauthor{jmusche1@jhu.edu}{John Muschelli III\corref {Corresponding Author}}
+\Newlabel{Johns Hopkins Bloomberg School of Public Health}{a}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\newlabel{introduction}{{1}{1}{Introduction}{section.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Methods}{4}{section.2}\protected@file@percent }
+\newlabel{methods}{{2}{4}{Methods}{section.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Motivating Example}{4}{subsection.2.1}\protected@file@percent }
+\newlabel{motivating-example}{{2.1}{4}{Motivating Example}{subsection.2.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.1.1}Summary values shared}{5}{subsubsection.2.1.1}\protected@file@percent }
+\newlabel{summary-values-shared}{{2.1.1}{5}{Summary values shared}{subsubsection.2.1.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Implementation}{6}{subsection.2.2}\protected@file@percent }
+\newlabel{implementation}{{2.2}{6}{Implementation}{subsection.2.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}Synced Folder Implementation}{6}{subsubsection.2.2.1}\protected@file@percent }
+\newlabel{synced-folder-implementation}{{2.2.1}{6}{Synced Folder Implementation}{subsubsection.2.2.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Illustration of the overall workflow. An analyst sets up the model using the setup\_model function. Once that is done, each respective site reads in their data and then runs estimate\_model, which computes gradients and sends them to the folder/server. Once all gradient values are computed, the coefficients for the next iterations are returned and the gradient is computed again. This process is repeated until convergence or a fixed number of iterations. The final model is then located in the synced folder/server, can be downloaded, and the iterations can either be deleted or investigated to ensure convergence and private information has been secure.}}{7}{figure.1}\protected@file@percent }
+\newlabel{fig:workflow}{{1}{7}{Illustration of the overall workflow. An analyst sets up the model using the setup\_model function. Once that is done, each respective site reads in their data and then runs estimate\_model, which computes gradients and sends them to the folder/server. Once all gradient values are computed, the coefficients for the next iterations are returned and the gradient is computed again. This process is repeated until convergence or a fixed number of iterations. The final model is then located in the synced folder/server, can be downloaded, and the iterations can either be deleted or investigated to ensure convergence and private information has been secure}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2}Plumber Implementation}{8}{subsubsection.2.2.2}\protected@file@percent }
+\newlabel{plumber-implementation}{{2.2.2}{8}{Plumber Implementation}{subsubsection.2.2.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{11}{section.3}\protected@file@percent }
+\newlabel{results}{{3}{11}{Results}{section.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Snapshot of the API documentation. This API endpoint documentation is automatically created when deployed, including the parameters needed for each endpoint.}}{12}{figure.2}\protected@file@percent }
+\newlabel{fig:docs}{{2}{12}{Snapshot of the API documentation. This API endpoint documentation is automatically created when deployed, including the parameters needed for each endpoint}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Model Trace}{16}{subsection.3.1}\protected@file@percent }
+\newlabel{model-trace}{{3.1}{16}{Model Trace}{subsection.3.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Discussion}{16}{section.4}\protected@file@percent }
+\newlabel{discussion}{{4}{16}{Discussion}{section.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Plot of coefficients over iterations. We present the coefficients over a number of iterations, separated by each variable. The blue line represents the estimate of the coefficient from the full-dataset model, which we want to estimate.}}{17}{figure.3}\protected@file@percent }
+\newlabel{fig:traceplot}{{3}{17}{Plot of coefficients over iterations. We present the coefficients over a number of iterations, separated by each variable. The blue line represents the estimate of the coefficient from the full-dataset model, which we want to estimate}{figure.3}{}}
+\newlabel{references}{{4}{18}{References}{section*.1}{}}
+\@writefile{toc}{\contentsline {section}{References}{18}{section*.1}\protected@file@percent }
