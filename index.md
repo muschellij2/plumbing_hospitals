@@ -11,7 +11,7 @@ address:
 abstract: |
   We present 2 practical approaches to fitting generalized linear models in a distributed framework.  The use case for this framework is where multiple sites (e.g. hospitals) have data with protected or private information that cannot be shared, but aggregate data can be, and each site can send aggregated data across the internet. The first strategy involves using an application programming interface (API), where sites submit the data to this service.  The second strategy uses synced folder services, such as Dropbox or Box Sync, to share the aggregated data. We provide an R package of examples and code to create an API on DigitalOcean at https://github.com/muschellij2/distribglm.
 journal: "Journal of Statistical Software"
-date: "2020-10-09"
+date: "2021-04-12"
 bibliography: refs.bib
 #linenumbers: true
 #numbersections: true
@@ -451,7 +451,7 @@ In Figure \@ref(fig:traceplot), we show the coefficients for each variable over 
 
 
 
-![(\#fig:traceplot)Plot of coefficients over iterations. We present the coefficients over a number of iterations, separated by each variable.  The blue line represents the estimate of the coefficient from the full-dataset model, which we want to estimate.](index_files/figure-latex/traceplot-1.pdf) 
+![(\#fig:traceplot)Plot of coefficients over iterations. We present the coefficients over a number of iterations, separated by each variable.  The blue line represents the estimate of the coefficient from the full-dataset model, which we are aiming to estimate.](index_files/figure-latex/traceplot-1.pdf) 
 
 # Discussion 
 
@@ -461,7 +461,7 @@ Though the system may seem simple to describe, many obstacles exist, namely data
 
 Though this caution is warranted, this system may be more secure than the alternative of sending estimates in other communication systems such as email.  While many of the data security issues exist with shared folders, this security is in line with solutions for shared folders at many institutions.  Though this solution seems like the easiest implementation, we believe the API solution breaks free of synced-folder services such as OneDrive or DropBox.  The API solution does require a server and though we provide an easy solution on DigitalOcean, many institutions choose to use their own systems, which may require an administrator to oversee it.  This administrator is usually trained in information systems or information technology, which is likely not part of the clinical team.  Thus, providing support or interaction from the clinical team to the technical personnel can be more costly than simply emailing estimates.  Lastly, many institutions and research groups require an application of what models are being fit with their data, and thus limits on the API need to be created, which may cause other issues or limitations on the proposed framework.  
 
-These downsides are vastly outweighed when the system gets repeated use.  Thus, fitting one model one time does not generally warrant the work needed to set up this framework.  One specific example is running the same model with different combinations of sites, allowing for a formal sensitivity analysis. The main downside, however, is that as aggregate data is transferred, federated modeling may increase the potential for wrong computation.  For example, checks on the data for missingness, quality, the sample size is equal to that of the previous iteration/model, and other issues, should be implemented for all modeling.  The `distriblm` package can add some of these features, but is not a suite of model checking and diagnostics.  This downside is likely in many of the one-shot solutions and approximations above.  In summary, this framework allows you to *fit* models from multiple sites, but the large caveats of data integrity and quality are still present.  An as an open-source project, researchers can contribute to these checks at https://github.com/muschellij2/distribglm.
+These downsides are vastly outweighed when the system gets repeated use.  Thus, fitting one model one time does not generally warrant the work needed to set up this framework.  One specific example is running the same model with different combinations of sites, allowing for a formal sensitivity analysis. The main downside, however, is that as aggregate data is transferred, federated modeling may increase the potential for wrong computation.  For example, checks on the data for missingness, quality, the sample size is equal to that of the previous iteration/model, and other issues, should be implemented for all modeling.  The `distriblm` package can add some of these features, but is not a suite of model checking and diagnostics.  This downside is likely in many of the one-shot solutions and approximations above.  In summary, this framework allows you to *fit* models from multiple sites, but the large caveats of data integrity and quality are still present.  An as an open-source project, researchers can contribute to these checks at https://github.com/muschellij2/distribglm.  The source for this manuscript is located at https://github.com/muschellij2/plumbing_hospitals.
 
 
 
