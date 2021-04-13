@@ -1,4 +1,4 @@
-all: index.pdf index.html README.md index.md figures
+all: index.pdf index.html README.md index.md figures index.R
 
 index.pdf: index.Rmd 
 	Rscript -e "rmarkdown::render('index.Rmd')"
@@ -8,6 +8,9 @@ index.html: index.Rmd
 
 README.md: README.Rmd 
 	Rscript -e "rmarkdown::render('README.Rmd')"
+
+index.R: index.Rmd 
+	Rscript -e "knitr::purl('index.Rmd')"
 
 # figures: original_image.png 
 figures: sketch.jpg
